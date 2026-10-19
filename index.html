@@ -244,9 +244,15 @@ footer{border-top:1px solid var(--line);color:var(--soft);font-size:.8rem;paddin
 /* =====================================================================
    CONFIGURACIÓN — ACÁ EDITÁS TODO
    ---------------------------------------------------------------------
-   1) Portadas: poné las imágenes en la carpeta  assets/  con el nombre
-      EXACTO del álbum + .png   →  assets/Californication.png
-      (los nombres están en la lista "album" de cada canción).
+   1) Portadas: poné las imágenes en la carpeta  assets/  con el nombre del
+      álbum TODO JUNTO, en MINÚSCULA y sin espacios ni símbolos:
+        Blood Sugar Sex Magik → assets/bloodsugarsexmagik.png
+        Californication       → assets/californication.png
+        By the Way            → assets/bytheway.png
+        Stadium Arcadium      → assets/stadiumarcadium.png
+        I'm with You          → assets/imwithyou.png
+        Unlimited Love        → assets/unlimitedlove.png
+      (Para un álbum nuevo: su nombre en minúscula, sin espacios ni símbolos.)
       Además poné assets/asterisco.png (tu logo); se cambia en ASTERISK_IMG.
       Formatos: png, jpg, jpeg o webp (ver COVER_EXTS).
       Si falta una imagen, se muestra un asterisco de reemplazo.
@@ -266,8 +272,9 @@ const ASSETS_DIR = "assets";
 const ASTERISK_IMG = ASSETS_DIR + "/asterisco.png";
 
 /* Formatos aceptados para las portadas de álbum, en este orden de prueba.
-   La imagen se busca como assets/<album>.<extensión>  (ej: assets/Californication.jpg).
-   Todo en minúscula: GitHub Pages distingue mayúsculas y minúsculas. */
+   La imagen se busca como assets/<album>.<extensión>  (ej: assets/californication.jpg),
+   con el álbum en minúscula y sin espacios. La extensión también va en minúscula:
+   GitHub Pages distingue mayúsculas y minúsculas. */
 const COVER_EXTS = ["png", "jpg", "jpeg", "webp"];
 
 /* ---------------------------------------------------------------------
@@ -277,7 +284,7 @@ const COVER_EXTS = ["png", "jpg", "jpeg", "webp"];
 
    { titulo:"Nombre de la canción", album:"Nombre del álbum", juego:"Rock Band 3 (DLC)", link:"", yt:"", estado:"" },
 
-   - album: define la portada → assets/<album>.png y el filtro de álbum.
+   - album: define la portada (assets/<album en minúscula y sin espacios>.png) y el filtro de álbum.
      Si escribís un álbum nuevo, aparece solo como filtro nuevo.
    - juego, link y yt pueden quedar vacíos ("").
    - yt: pegá el link completo del video de YouTube o solo su ID, cualquiera de los dos sirve.
@@ -460,6 +467,9 @@ function buildChips() {
   });
 }
 
+/* "Stadium Arcadium" → "stadiumarcadium", "I'm with You" → "imwithyou" */
+const coverSlug = a => a.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
 const coverCache = {};   // recuerda qué extensión funcionó para cada álbum
 
 function coverPlaceholder(big) {
@@ -473,7 +483,7 @@ function coverPlaceholder(big) {
 function cover(album, big) {
   if (coverCache[album] === false) return coverPlaceholder(big);
   const exts = coverCache[album] ? [coverCache[album]] : COVER_EXTS;
-  const base = ASSETS_DIR + "/" + encodeURIComponent(album) + ".";
+  const base = ASSETS_DIR + "/" + coverSlug(album) + ".";
   let i = 0;
   const img = el("img", { class: "cover" + (big ? " big" : ""), alt: "Portada de " + (ALBUM_NOMBRES[album] || album), loading: "lazy" });
   img.addEventListener("load", () => { coverCache[album] = exts[i]; });
