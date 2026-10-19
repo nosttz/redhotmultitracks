@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RHCP MULTITRACKS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#000; --ink:#0a0a0a; --ink2:#150404;
+  --white:#fff; --soft:rgba(255,255,255,.66);
+  --red:#e10600; --red-hi:#ff2a1f; --red-lo:#7a0300;
+  --line:rgba(225,6,0,.32);
+  --display:'Archivo Black','Impact','Arial Black',sans-serif;
+  --body:'Archivo','Segoe UI',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:var(--body);line-height:1.5;min-height:100vh}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--white);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+/* ---------- Hero ---------- */
+header.hero{position:relative;overflow:hidden;border-bottom:3px solid var(--red);
+  background:
+    radial-gradient(ellipse 60% 120% at 88% 40%, rgba(225,6,0,.55), transparent 70%),
+    linear-gradient(180deg,#120000 0%, var(--black) 100%)}
+header.hero::before{content:"";position:absolute;top:-20%;right:18%;width:90px;height:140%;
+  background:var(--red);opacity:.12;transform:skewX(-18deg)}
+header.hero::after{content:"";position:absolute;top:-20%;right:8%;width:26px;height:140%;
+  background:var(--white);opacity:.08;transform:skewX(-18deg)}
+.hero .wrap{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:28px;padding-top:64px;padding-bottom:58px}
+.hero h1{font-family:var(--display);font-size:clamp(2.6rem,8vw,5.6rem);line-height:.92;letter-spacing:-.02em;text-transform:uppercase;
+  animation:rise .7s var(--ease) both}
+.bar{height:8px;width:min(320px,60%);margin:20px 0 18px;background:linear-gradient(90deg,var(--red),var(--red-hi));
+  transform-origin:left;animation:grow .8s .25s var(--ease) both}
+.hero p{color:var(--soft);max-width:44ch;animation:rise .7s .15s var(--ease) both}
+/* Disco giratorio: el logo gira como un vinilo con aros alrededor.
+   Velocidades: --disc-speed (logo), --ring-speed (aros), --loop-speed (aro de la izquierda). */
+.disc{--disc-speed:30s;--ring-speed:10s;--loop-speed:16s;
+  position:relative;flex:none;width:clamp(150px,26vw,280px);aspect-ratio:1;display:grid;place-items:center}
+.ring{position:absolute;border-radius:50%;pointer-events:none;will-change:transform}
+.ring-a{inset:0;border:3px solid transparent;border-top-color:var(--red);border-bottom-color:var(--red);
+  filter:drop-shadow(0 0 10px rgba(225,6,0,.7));animation:spin var(--ring-speed) linear infinite}
+.ring-b{inset:8%;border:2px dashed rgba(255,255,255,.55);animation:spin calc(var(--ring-speed) * 2.2) linear infinite reverse}
+.ring-loop{width:72%;aspect-ratio:1;left:-48%;top:14%;border:2px dashed var(--red);opacity:.75;
+  animation:spin var(--loop-speed) linear infinite reverse}
+.asterisk{width:66%;height:auto;display:block;position:relative;
+  filter:drop-shadow(0 0 28px rgba(225,6,0,.55));animation:spin-left var(--disc-speed) linear infinite;will-change:transform}
+.asterisk[hidden]{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin-left{to{transform:rotate(-360deg)}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* ---------- Controles ---------- */
+.controls{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.96);border-bottom:1px solid var(--line)}
+.controls .wrap{padding-top:14px;padding-bottom:14px}
+.search{width:100%;background:var(--black);border:2px solid var(--line);color:var(--white);
+  border-radius:10px;padding:13px 16px;font:inherit;font-size:1rem;transition:border-color .2s,box-shadow .2s}
+.search::placeholder{color:var(--soft)}
+.search:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(225,6,0,.22)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:thin;scrollbar-color:var(--red) transparent}
+.chip{flex:none;background:transparent;border:1px solid var(--line);color:var(--white);
+  border-radius:999px;padding:6px 14px;font:inherit;font-size:.85rem;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.chip:hover{border-color:var(--red);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{background:var(--red);border-color:var(--red)}
+.count{color:var(--soft);font-size:.85rem;margin:24px 0 14px}
+
+/* ---------- Lista ---------- */
+main{padding-bottom:80px}
+.list{display:grid;gap:14px;list-style:none;padding:0}
+.song{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  background:linear-gradient(100deg,var(--ink2) 0%,var(--ink) 45%,var(--black) 100%);
+  transition:transform .25s var(--ease),border-color .25s;
+  animation:rise .5s var(--ease) backwards;animation-delay:calc(var(--i,0) * 35ms)}
+.song::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--red);
+  transform:scaleY(.35);transform-origin:center;transition:transform .3s var(--ease);z-index:1}
+.song::after{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;
+  box-shadow:0 10px 30px rgba(225,6,0,.3);opacity:0;transition:opacity .25s}
+.song:hover,.song.open{transform:translateY(-2px);border-color:var(--red)}
+.song:hover::before,.song.open::before{transform:scaleY(1)}
+.song:hover::after,.song.open::after{opacity:1}
+.row{position:relative;z-index:2;display:grid;grid-template-columns:76px 1fr auto;gap:18px;align-items:center;padding:14px 14px 14px 20px}
+.cover{width:76px;height:76px;border-radius:8px;border:2px solid var(--red);background:var(--black);object-fit:cover;display:block;
+  transition:transform .3s var(--ease)}
+.song:hover .cover{transform:scale(1.06) rotate(-2deg)}
+.cover.ph{display:grid;place-items:center}
+.cover.ph img{width:70%;height:70%;object-fit:contain}
+.info h3{font-size:1.1rem;font-weight:600;overflow-wrap:anywhere}
+.meta{color:var(--soft);font-size:.85rem;margin-top:3px}
+.tag{display:inline-block;margin-left:8px;padding:1px 9px;border:1px solid var(--red);border-radius:999px;font-size:.72rem;color:var(--white);background:rgba(225,6,0,.18)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:10px 16px;font:inherit;font-size:.9rem;
+  font-weight:600;text-decoration:none;cursor:pointer;border:1px solid var(--white);background:var(--black);color:var(--white);
+  transition:transform .2s var(--ease),background .2s,color .2s}
+.btn:hover{background:var(--white);color:var(--black);transform:translateY(-1px)}
+.btn.primary{background:var(--red);border-color:var(--red);color:var(--white)}
+.btn.primary::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);transform:skewX(-20deg)}
+.btn.primary:hover{background:var(--red-hi);color:var(--white)}
+.btn.primary:hover::after{left:130%;transition:left .55s var(--ease)}
+.btn[aria-disabled="true"]{opacity:.4;cursor:not-allowed;pointer-events:none}
+.video{position:relative;z-index:2;display:none;border-top:2px solid var(--red);background:var(--black)}
+.song.open .video{display:block}
+.video .ratio{position:relative;aspect-ratio:16/9;max-height:460px;margin:0 auto}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.empty{padding:60px 10px;text-align:center;color:var(--soft)}
+footer{border-top:1px solid var(--line);color:var(--soft);font-size:.8rem;padding:24px 0}
+
+/* ---------- Estadísticas, idioma, álbum, estados ---------- */
+.stats{display:flex;gap:28px;margin-top:24px;animation:rise .7s .3s var(--ease) both}
+.stat strong{display:block;font-family:var(--display);font-size:clamp(1.6rem,4vw,2.3rem);line-height:1}
+.stat span{font-size:.75rem;color:var(--soft);text-transform:uppercase;letter-spacing:.08em}
+.stat + .stat{padding-left:28px;border-left:2px solid var(--red)}
+.ctrl-row{display:flex;gap:10px;align-items:stretch}
+.ctrl-row .search{flex:1;min-width:0;width:auto}
+.lang{display:flex;flex:none;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.lang button{background:var(--black);color:var(--white);border:0;padding:0 14px;font:inherit;font-weight:600;cursor:pointer;transition:background .2s}
+.lang button:hover{background:var(--red-lo)}
+.lang button[aria-pressed="true"]{background:var(--red)}
+.chip .n{margin-left:8px;font-size:.72rem;opacity:.75}
+.album-head{display:flex;align-items:center;gap:24px;margin:26px 0 4px;padding:20px;border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(100deg,var(--ink2),var(--black));animation:rise .5s var(--ease) both}
+.album-head[hidden]{display:none}
+.album-head h2{font-family:var(--display);font-size:clamp(1.5rem,4vw,2.4rem);line-height:1.05;text-transform:uppercase}
+.album-meta{margin-top:10px;color:var(--soft)}
+.album-meta .tag{margin:0 10px 0 0}
+.cover.big{width:clamp(120px,24vw,200px);height:auto;aspect-ratio:1;border-radius:12px;box-shadow:0 14px 40px rgba(225,6,0,.35);flex:none}
+.badge{display:inline-block;margin-left:10px;padding:1px 8px;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}
+.badge.new{background:var(--red);color:var(--white)}
+.badge.down{border:1px solid var(--white);color:var(--white)}
+.song.is-down .info,.song.is-down .cover{opacity:.5}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--soft);padding:10px 8px;font-weight:500;font-size:.82rem;text-decoration:underline;text-underline-offset:3px}
+.btn.ghost:hover{background:transparent;color:var(--white);transform:none}
+.to-top{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:6;width:48px;height:48px;
+  border-radius:50%;border:2px solid var(--white);background:var(--red);color:var(--white);cursor:pointer;display:grid;place-items:center;
+  opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .25s,transform .25s var(--ease),background .2s}
+.to-top.show{opacity:1;transform:none;pointer-events:auto}
+.to-top:hover{background:var(--red-hi)}
+.to-top svg{width:22px;height:22px}
+@media (max-width:640px){
+  .stats{gap:18px}.stat + .stat{padding-left:18px}
+  .lang button{padding:0 10px}
+  .album-head{gap:14px;padding:14px}
+}
+
+@media (max-width:640px){
+  .ring-loop{display:none}
+  .row{grid-template-columns:60px 1fr;gap:12px;padding-left:18px}
+  .cover{width:60px;height:60px}
+  .actions{grid-column:1 / -1;justify-content:stretch}
+  .actions .btn{flex:1;justify-content:center}
+  header.hero::before,header.hero::after{display:none}
+}
+/* ---------- Animaciones extra (solo transform/opacity: livianas) ---------- */
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes glow{0%,100%{opacity:.45;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes sheen{from{transform:translateX(-120%)}60%,to{transform:translateX(320%)}}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes eq{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+.disc::before{content:"";position:absolute;inset:-12%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(225,6,0,.45),transparent 65%);animation:glow 4s ease-in-out infinite}
+.bar{position:relative;overflow:hidden}
+.bar::after{content:"";position:absolute;top:0;bottom:0;left:0;width:35%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);animation:sheen 3.6s 1.4s ease-in-out infinite}
+.chip[aria-pressed="true"]{animation:pop .35s var(--ease)}
+.chip:active,.btn:active{transform:scale(.97)}
+.song.open .video{animation:fadeDown .4s var(--ease)}
+.album-head .cover{animation:pop .6s .1s var(--ease) backwards}
+.album-head h2{animation:rise .5s .15s var(--ease) backwards}
+.badge.new{animation:beat 2s ease-in-out infinite}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:14px;margin-left:10px;vertical-align:middle;opacity:0;transition:opacity .2s}
+.eq i{width:3px;height:100%;background:var(--red);transform-origin:bottom;transform:scaleY(.25);animation:eq .9s ease-in-out infinite;animation-play-state:paused}
+.eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.6s}
+.song:hover .eq{opacity:1}
+.song:hover .eq i{animation-play-state:running}
+.to-top svg{transition:transform .25s var(--ease)}
+.to-top:hover svg{transform:translateY(-3px)}
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--red-hi);transform-origin:left;transform:scaleX(0);z-index:9;pointer-events:none}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+/* El logo gira lento aunque el sistema tenga 'reducir animaciones'. Borrá esta regla para respetar esa opción. */
+.asterisk{animation:spin-left var(--disc-speed) linear infinite!important}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Red Hot<br>Chili Peppers</h1>
+      <div class="bar"></div>
+      <p data-i18n="hero_p">Multitracks Oficiales de Red Hot Chili Peppers, sin publicidades, link directo, ¡Disfruta!.</p>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="disc" aria-hidden="true">
+      <span class="ring ring-loop"></span>
+      <span class="ring ring-a"></span>
+      <span class="ring ring-b"></span>
+      <img class="asterisk" id="heroAst" alt="" hidden>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="ctrl-row">
+      <input id="q" class="search" type="search" placeholder="Buscar canción o álbum…" aria-label="Buscar canción o álbum" data-i18n-ph="search_ph" data-i18n-aria="search_ph" autocomplete="off">
+      <div class="lang" role="group" aria-label="Idioma / Language">
+        <button type="button" data-lang="es" aria-pressed="true">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filtrar por álbum" data-i18n-aria="filter_aria"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="album-head" id="albumHead" hidden></section>
+  <p class="count" id="count" aria-live="polite"></p>
+  <ul class="list" id="list"></ul>
+  <p class="empty" id="empty" data-i18n="empty" hidden>No hay canciones que coincidan con la búsqueda.</p>
+</main>
+
+<footer>
+  <div class="wrap" data-i18n="footer">Sitio de fan y para fans de Red Hot Chili Peppers.</div>
+</footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="Volver arriba" data-i18n-aria="top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN — ACÁ EDITÁS TODO
+   ---------------------------------------------------------------------
+   1) Portadas: poné las imágenes en la carpeta  assets/  con el nombre
+      EXACTO del álbum + .png   →  assets/Californication.png
+      (los nombres están en la lista "album" de cada canción).
+      Además poné assets/asterisco.png (tu logo); se cambia en ASTERISK_IMG.
+      Formatos: png, jpg, jpeg o webp (ver COVER_EXTS).
+      Si falta una imagen, se muestra un asterisco de reemplazo.
+
+   2) Link de descarga: pegá tu link real en  link: "..."
+      Si queda vacío, el botón aparece desactivado ("Link pendiente").
+
+   3) Video de YouTube: pegá SOLO el ID del video en  yt: "..."
+      (de https://www.youtube.com/watch?v=lwlogyj7nFE el ID es lwlogyj7nFE).
+      Si queda vacío, el botón abre la búsqueda en YouTube.
+
+   4) "juego" es solo una etiqueta informativa: corregila si hace falta.
+   ===================================================================== */
+const ASSETS_DIR = "assets";
+/* Imagen del asterisco (logo). Poné tu PNG en assets/ y cambiá el nombre acá.
+   Se usa en el encabezado y como reemplazo de las portadas que falten. */
+const ASTERISK_IMG = ASSETS_DIR + "/asterisco.png";
+
+/* Formatos aceptados para las portadas de álbum, en este orden de prueba.
+   La imagen se busca como assets/<album>.<extensión>  (ej: assets/Californication.jpg).
+   Todo en minúscula: GitHub Pages distingue mayúsculas y minúsculas. */
+const COVER_EXTS = ["png", "jpg", "jpeg", "webp"];
+
+/* ---------------------------------------------------------------------
+   AGREGAR UNA CANCIÓN NUEVA (copiá y pegá una línea):
+   Pegala justo ANTES de la línea "FIN DE LA LISTA" (más abajo) y no te
+   olvides de la coma al final.
+
+   { titulo:"Nombre de la canción", album:"Nombre del álbum", juego:"Rock Band 3 (DLC)", link:"", yt:"", estado:"" },
+
+   - album: define la portada → assets/<album>.png y el filtro de álbum.
+     Si escribís un álbum nuevo, aparece solo como filtro nuevo.
+   - juego, link y yt pueden quedar vacíos ("").
+   - yt: pegá el link completo del video de YouTube o solo su ID, cualquiera de los dos sirve.
+   - estado (opcional): "nuevo" muestra la marca NUEVO; "caido" muestra
+     LINK CAÍDO y desactiva la descarga. Vacío o sin el campo = normal.
+   - Si el título lleva comillas dobles, escribilas así: \"
+   --------------------------------------------------------------------- */
+
+/* Nombres para mostrar de los álbumes cuando el nombre del archivo de
+   portada no puede llevar símbolos (opcional). */
+const ALBUM_NOMBRES = {
+  "Im with You": "I'm with You",
+  "Mothers Milk": "Mother's Milk"
+};
+
+/* Año de cada álbum (se muestra en el encabezado al filtrar por álbum). */
+const ALBUM_ANIOS = {
+  "Mothers Milk": 1989, "Blood Sugar Sex Magik": 1991, "One Hot Minute": 1995, "Californication": 1999,
+  "By the Way": 2002, "Stadium Arcadium": 2006, "Im with You": 2011, "The Getaway": 2016, "Unlimited Love": 2022
+};
+
+/* REPORTAR LINK CAÍDO — completá UNA de las dos opciones:
+   - REPORT_EMAIL: tu correo. El botón abre el mail con la canción ya cargada.
+   - REPORT_FORM: link de un formulario (ej. Google Forms). Podés usar {cancion},
+     {album} y {link} para pre-cargar datos.
+   Si las dos quedan vacías, el botón "Reportar" no se muestra. */
+const REPORT_EMAIL = "redhotchilitracks@gmail.com";
+const REPORT_FORM  = "";
+
+/* true = las canciones con link aparecen primero y las pendientes/caídas al final. */
+const ORDENAR_DISPONIBLES_PRIMERO = true;
+
+/* Textos en español e inglés. Editá lo que quieras. */
+const I18N = {
+  es: {
+    hero_p: "Multitracks Oficiales de Red Hot Chili Peppers, sin publicidades, link directo, ¡Disfruta!.",
+    search_ph: "Buscar canción o álbum…", filter_aria: "Filtrar por álbum", all: "Todos",
+    song_one: "canción", song_many: "canciones",
+    stat_songs: "canciones", stat_albums: "álbumes", stat_avail: "disponibles",
+    avail_of: "{n} de {m} disponibles",
+    empty: "No hay canciones que coincidan con la búsqueda.",
+    dl: "Descargar", pending: "Link pendiente", down: "Link caído",
+    watch: "Ver video", close_video: "Cerrar video", yt_search: "Buscar en YouTube",
+    report: "Reportar link", badge_new: "Nuevo", badge_down: "Link caído", top: "Volver arriba",
+    report_subject: "Link caído: {song}",
+    report_body: "Hola, este link no funciona.\n\nCanción: {song}\nÁlbum: {album}\nLink: {link}\n",
+    footer: "Sitio de fan y para fans de Red Hot Chili Peppers."
+  },
+  en: {
+    hero_p: "Official Red Hot Chili Peppers multitracks. No ads, direct links. Enjoy!",
+    search_ph: "Search song or album…", filter_aria: "Filter by album", all: "All",
+    song_one: "song", song_many: "songs",
+    stat_songs: "songs", stat_albums: "albums", stat_avail: "available",
+    avail_of: "{n} of {m} available",
+    empty: "No songs match your search.",
+    dl: "Download", pending: "Link pending", down: "Link down",
+    watch: "Watch video", close_video: "Close video", yt_search: "Search on YouTube",
+    report: "Report link", badge_new: "New", badge_down: "Link down", top: "Back to top",
+    report_subject: "Broken link: {song}",
+    report_body: "Hi, this link is not working.\n\nSong: {song}\nAlbum: {album}\nLink: {link}\n",
+    footer: "A fan site made by and for Red Hot Chili Peppers fans."
+  }
+};
+
+const SONGS = [
+  // Blood Sugar Sex Magik
+  { titulo:"The Power of Equality", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/h8junbxxaj7k9rz/The+Power+of+Equality.zip/file", yt:"" },
+  { titulo:"If You Have to Ask", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/86lzum4i1sd7n9l/If_You_Have_to_Ask.zip/file", yt:"" },
+  { titulo:"Breaking the Girl", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/39cnpx56ijd8vi1/Breaking+the+Girl.zip/file", yt:"" },
+  { titulo:"Funky Monks", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/iffz5749abuxivv/Funky+Monks.zip/file", yt:"" },
+  { titulo:"Suck My Kiss", album:"Blood Sugar Sex Magik", juego:"Guitar Hero III / Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/wldpry62gjojazb/Suck+My+Kiss.zip/file", yt:"" },
+  { titulo:"I Could Have Lied", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/uhd8h389k0yd5la/I_Could_Have_Lied.zip/file", yt:"" },
+  { titulo:"Mellowship Slinky in B Major", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/nyhbzcf12jc7dy7/Mellowship+Slinky+in+B+Major.zip/file", yt:"" },
+  { titulo:"The Righteous & The Wicked", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/ol5ll3vxgu5xwuz/The+Righteous+and+the+Wicked.zip/file", yt:"" },
+  { titulo:"Give It Away", album:"Blood Sugar Sex Magik", juego:"Rock Band 2", link:"https://www.mediafire.com/file/puzhgchzkchy8n0/Give_It_Away446.zip/file", yt:"" },
+  { titulo:"Blood Sugar Sex Magik", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/aelkef79cdj4vps/Blood_Sugar_Sex_Magik11.zip/file", yt:"" },
+  { titulo:"Under the Bridge", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/o9mn3rpcqwqu47g/Under+the+Bridge.zip/file", yt:"" },
+  { titulo:"Naked in the Rain", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/pjyyoqrl7v16tra/Naked+in+the+Rain.zip/file", yt:"" },
+  { titulo:"Apache Rose Peacock", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/lqq37iz8hix64eh/Apache+Rose+Peacock.zip/file", yt:"" },
+  { titulo:"The Greeting Song", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/gw1nxrwno9fmudn/The+Greeting+Song.zip/file", yt:"" },
+  { titulo:"My Lovely Man", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/djoqtlet4jaeeoc/My+Lovely+Man.zip/file", yt:"" },
+  { titulo:"Sir Psycho Sexy", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/1vc1b651rd7omk3/Sir+Psycho+Sexy.zip/file", yt:"" },
+  { titulo:"They're Red Hot", album:"Blood Sugar Sex Magik", juego:"Rock Band 2 (DLC)", link:"https://www.mediafire.com/file/mkuakpp0defqssp/They're+Red+Hot.zip/file", yt:"" },
+  // Californication
+  { titulo:"Scar Tissue", album:"Californication", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/nazi23s7m0zofv9/Scar_Tissue4189.zip/file", yt:"" },
+  { titulo:"Otherside", album:"Californication", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/vpo4lqu125inzk8/Otherside.zip/file", yt:"rn_YodiJO6k" },
+  { titulo:"Californication", album:"Californication", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/88c1ib6c3fumrxl/Californication142.zip/file", yt:"" },
+  { titulo:"Parallel Universe", album:"Californication", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/rvdajxj68n7126x/Parallel_Universe.zip/file", yt:"" },
+  // By the Way
+  { titulo:"By the Way", album:"By the Way", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/geti7knnq8wh18g/By+the+Way.zip/file", yt:"" },
+  // Stadium Arcadium
+  { titulo:"Dani California", album:"Stadium Arcadium", juego:"Rock Band", link:"https://www.mediafire.com/file/hcl6clf125u62kw/Dani_California642.zip/file", yt:"" },
+  { titulo:"Snow (Hey Oh)", album:"Stadium Arcadium", juego:"Rock Band (DLC)", link:"https://www.mediafire.com/file/sapzrx9mmjycelr/Snow_%2528Hey_Oh%25292819.zip/file", yt:"" },
+  { titulo:"Tell Me Baby", album:"Stadium Arcadium", juego:"Rock Band (DLC)", link:"https://www.mediafire.com/file/w0pto55mypxnhqr/Tell_Me_Baby.zip/file", yt:"" },
+  // Im with You
+  { titulo:"Look Around", album:"Im with You", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/1048tpso1mkzjx4/Look_Around.zip/file", yt:"" },
+  { titulo:"Monarchy of Roses", album:"Im with You", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/5hj4cc3ar9i33ud/Monarchy_Of_Roses.zip/file", yt:"" },
+  { titulo:"The Adventures of Rain Dance Maggie", album:"Im with You", juego:"Rock Band 3 (DLC)", link:"https://www.mediafire.com/file/zrfmhx9jm5rhq60/The_Adventures_of_Rain_Dance_Maggie.zip/file", yt:"" },
+   { titulo:"Knock Me Down", album:"Mothers Milk", juego:"Guitar Hero: World Tour", link:"https://www.mediafire.com/file/j3smhrfuxl1u8c3/Knock+Me+Down.zip/file", yt:"" },
+  // ▼▼▼ PEGÁ TUS CANCIONES NUEVAS ACÁ ARRIBA DE ESTA LÍNEA ▼▼▼
+  // FIN DE LA LISTA
+];
+/* ===================== FIN DE LA CONFIGURACIÓN ===================== */
+
+const $ = id => document.getElementById(id);
+const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+
+function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+let lang = safeGet("lang") || ((navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en");
+if (!I18N[lang]) lang = "es";
+const t = (k, vars) => {
+  let str = (I18N[lang] && I18N[lang][k]) || I18N.es[k] || k;
+  if (vars) for (const v in vars) str = str.replace("{" + v + "}", vars[v]);
+  return str;
+};
+const isDown = s => s.estado === "caido";
+const hasLink = s => !!s.link && !isDown(s);
+const countAvail = list => list.filter(hasLink).length;
+const albumName = a => ALBUM_NOMBRES[a] || a;
+
+function applyStatic() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = t(n.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(n => { n.placeholder = t(n.dataset.i18nPh); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(n => n.setAttribute("aria-label", t(n.dataset.i18nAria)));
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+}
+
+let activeAlbum = "Todos";
+const albums = ["Todos", ...new Set(SONGS.map(s => s.album))];
+
+function el(tag, props = {}, children = []) {
+  const n = document.createElement(tag);
+  Object.entries(props).forEach(([k, v]) => {
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else n.setAttribute(k, v);
+  });
+  children.forEach(c => n.appendChild(c));
+  return n;
+}
+
+let statsAnimated = false;
+function countUp(node, n) {
+  if (statsAnimated || n < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) { node.textContent = String(n); return; }
+  const t0 = performance.now(), dur = 900;
+  const step = now => {
+    const k = Math.min((now - t0) / dur, 1);
+    node.textContent = String(Math.round(n * (1 - Math.pow(1 - k, 3))));
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function renderStats() {
+  const data = [[SONGS.length, "stat_songs"], [albums.length - 1, "stat_albums"], [countAvail(SONGS), "stat_avail"]];
+  $("stats").replaceChildren(...data.map(([n, k]) => {
+    const num = el("strong", { text: "0" });
+    countUp(num, n);
+    return el("div", { class: "stat" }, [num, el("span", { text: t(k) })]);
+  }));
+  statsAnimated = true;
+}
+
+function buildChips() {
+  const box = $("chips");
+  box.replaceChildren();
+  albums.forEach(a => {
+    const list = a === "Todos" ? SONGS : SONGS.filter(s => s.album === a);
+    const b = el("button", { class: "chip", type: "button", "data-album": a, "aria-pressed": String(a === activeAlbum) },
+      [document.createTextNode(a === "Todos" ? t("all") : albumName(a)),
+       el("span", { class: "n", text: countAvail(list) + "/" + list.length })]);
+    b.addEventListener("click", () => {
+      activeAlbum = a;
+      box.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.album === a)));
+      render();
+    });
+    box.appendChild(b);
+  });
+}
+
+const coverCache = {};   // recuerda qué extensión funcionó para cada álbum
+
+function coverPlaceholder(big) {
+  const ph = el("div", { class: "cover ph" + (big ? " big" : ""), role: "img", "aria-label": "Sin portada" });
+  const a = el("img", { alt: "", src: ASTERISK_IMG });
+  a.addEventListener("error", () => a.remove(), { once: true });
+  ph.appendChild(a);
+  return ph;
+}
+
+function cover(album, big) {
+  if (coverCache[album] === false) return coverPlaceholder(big);
+  const exts = coverCache[album] ? [coverCache[album]] : COVER_EXTS;
+  const base = ASSETS_DIR + "/" + encodeURIComponent(album) + ".";
+  let i = 0;
+  const img = el("img", { class: "cover" + (big ? " big" : ""), alt: "Portada de " + (ALBUM_NOMBRES[album] || album), loading: "lazy" });
+  img.addEventListener("load", () => { coverCache[album] = exts[i]; });
+  img.addEventListener("error", () => {
+    i++;
+    if (i < exts.length) { img.src = base + exts[i]; }
+    else { coverCache[album] = false; img.replaceWith(coverPlaceholder(big)); }
+  });
+  img.src = base + exts[0];
+  return img;
+}
+
+/* Acepta el ID o el link completo de YouTube (watch?v=, youtu.be/, embed/, shorts/). */
+function ytId(v) {
+  if (!v) return "";
+  const m = String(v).trim().match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/) || String(v).trim().match(/^([\w-]{11})$/);
+  return m ? m[1] : "";
+}
+
+function toggleVideo(card, s, btn) {
+  const open = card.classList.toggle("open");
+  btn.setAttribute("aria-expanded", String(open));
+  btn.textContent = open ? t("close_video") : t("watch");
+  const box = card.querySelector(".video");
+  if (open && !box.firstChild) {
+    if (ytId(s.yt)) {
+      const ratio = el("div", { class: "ratio" });
+      ratio.appendChild(el("iframe", {
+        src: "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(ytId(s.yt)) + "?rel=0",
+        title: "Video de " + s.titulo,
+        allow: "accelerometer; encrypted-media; picture-in-picture; fullscreen",
+        allowfullscreen: "", loading: "lazy"
+      }));
+      box.appendChild(ratio);
+    }
+  }
+  if (!open) box.replaceChildren();
+}
+
+function reportHref(s) {
+  const info = { cancion: s.titulo, album: albumName(s.album), link: s.link };
+  if (REPORT_FORM) return REPORT_FORM.replace(/\{(\w+)\}/g, (m, k) => encodeURIComponent(info[k] || ""));
+  if (REPORT_EMAIL) {
+    const body = t("report_body", { song: s.titulo, album: albumName(s.album), link: s.link });
+    return "mailto:" + REPORT_EMAIL + "?subject=" + encodeURIComponent(t("report_subject", { song: s.titulo })) +
+           "&body=" + encodeURIComponent(body);
+  }
+  return null;
+}
+
+function card(s) {
+  const li = el("li", { class: "song" + (isDown(s) ? " is-down" : "") });
+  const title = el("h3", { text: s.titulo });
+  if (s.estado === "nuevo") title.appendChild(el("span", { class: "badge new", text: t("badge_new") }));
+  if (isDown(s)) title.appendChild(el("span", { class: "badge down", text: t("badge_down") }));
+  title.appendChild(el("span", { class: "eq", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]));
+  const meta = el("p", { class: "meta" }, [document.createTextNode(albumName(s.album))]);
+  if (s.juego) meta.appendChild(el("span", { class: "tag", text: s.juego }));
+  const info = el("div", { class: "info" }, [title, meta]);
+
+  const dl = hasLink(s)
+    ? el("a", { class: "btn primary", href: s.link, target: "_blank", rel: "noopener noreferrer", text: t("dl") })
+    : el("span", { class: "btn primary", "aria-disabled": "true", text: isDown(s) ? t("down") : t("pending") });
+
+  let vid;
+  if (ytId(s.yt)) {
+    vid = el("button", { class: "btn", type: "button", "aria-expanded": "false", text: t("watch") });
+    vid.addEventListener("click", () => toggleVideo(li, s, vid));
+  } else {
+    vid = el("a", { class: "btn", target: "_blank", rel: "noopener noreferrer", text: t("yt_search"),
+      href: "https://www.youtube.com/results?search_query=" + encodeURIComponent("Red Hot Chili Peppers " + s.titulo + " official video") });
+  }
+
+  const actions = [vid, dl];
+  const rep = hasLink(s) ? reportHref(s) : null;
+  if (rep) {
+    const r = el("a", { class: "btn ghost", href: rep, text: t("report") });
+    if (/^https?:/i.test(rep)) { r.target = "_blank"; r.rel = "noopener noreferrer"; }
+    actions.push(r);
+  }
+
+  const row = el("div", { class: "row" }, [cover(s.album), info, el("div", { class: "actions" }, actions)]);
+  li.append(row, el("div", { class: "video" }));
+  return li;
+}
+
+function renderAlbumHead() {
+  const box = $("albumHead");
+  if (activeAlbum === "Todos") { box.hidden = true; box.replaceChildren(); return; }
+  const list = SONGS.filter(s => s.album === activeAlbum);
+  const meta = el("p", { class: "album-meta" });
+  if (ALBUM_ANIOS[activeAlbum]) meta.appendChild(el("span", { class: "tag", text: String(ALBUM_ANIOS[activeAlbum]) }));
+  meta.appendChild(document.createTextNode(t("avail_of", { n: countAvail(list), m: list.length })));
+  box.replaceChildren(cover(activeAlbum, true), el("div", {}, [el("h2", { text: albumName(activeAlbum) }), meta]));
+  box.hidden = false;
+  box.style.animation = "none"; void box.offsetWidth; box.style.animation = "";
+}
+
+function render() {
+  const q = norm($("q").value.trim());
+  const res = SONGS.filter(s =>
+    (activeAlbum === "Todos" || s.album === activeAlbum) &&
+    (!q || norm(s.titulo).includes(q) || norm(s.album).includes(q) || norm(s.juego || "").includes(q)));
+  if (ORDENAR_DISPONIBLES_PRIMERO) res.sort((a, b) => hasLink(b) - hasLink(a));
+  renderAlbumHead();
+  $("list").replaceChildren(...res.map((s, i) => {
+    const c = card(s);
+    c.style.setProperty("--i", Math.min(i, 10));
+    return c;
+  }));
+  $("empty").hidden = res.length > 0;
+  $("count").textContent = res.length + " " + t(res.length === 1 ? "song_one" : "song_many");
+}
+
+const ast = $("heroAst");
+ast.addEventListener("load", () => { ast.hidden = false; });
+ast.src = ASTERISK_IMG;
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => {
+  lang = b.dataset.lang;
+  safeSet("lang", lang);
+  applyStatic(); renderStats(); buildChips(); render();
+}));
+
+const toTop = $("toTop");
+const progress = $("progress");
+let ticking = false;
+window.addEventListener("scroll", () => {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => {
+    toTop.classList.toggle("show", window.scrollY > 600);
+    const max = document.documentElement.scrollHeight - innerHeight;
+    progress.style.transform = "scaleX(" + (max > 0 ? Math.min(window.scrollY / max, 1) : 0) + ")";
+    ticking = false;
+  });
+}, { passive: true });
+toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+applyStatic();
+renderStats();
+buildChips();
+$("q").addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
