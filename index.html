@@ -48,7 +48,7 @@ header.hero::after{content:"";position:absolute;top:-20%;right:8%;width:26px;hei
 .ring-a{inset:0;border:3px solid transparent;border-top-color:var(--red);border-bottom-color:var(--red);
   filter:drop-shadow(0 0 10px rgba(225,6,0,.7));animation:spin var(--ring-speed) linear infinite}
 .ring-b{inset:8%;border:2px dashed rgba(255,255,255,.55);animation:spin calc(var(--ring-speed) * 2.2) linear infinite reverse}
-.ring-loop{width:72%;aspect-ratio:1;left:-48%;top:14%;border:2px dashed var(--red);opacity:.75;
+.ring-loop{inset:-9%;border:2px dashed var(--red);opacity:.75;
   animation:spin var(--loop-speed) linear infinite reverse}
 .asterisk{width:66%;height:auto;display:block;position:relative;
   filter:drop-shadow(0 0 28px rgba(225,6,0,.55));animation:spin-left var(--disc-speed) linear infinite;will-change:transform}
@@ -185,11 +185,56 @@ footer{border-top:1px solid var(--line);color:var(--soft);font-size:.8rem;paddin
 .to-top:hover svg{transform:translateY(-3px)}
 .progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--red-hi);transform-origin:left;transform:scaleX(0);z-index:9;pointer-events:none}
 
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
+
+:root{--panel:#0d0d0f;--panel2:#141418;--edge:rgba(255,255,255,.08);--edge-hi:rgba(255,255,255,.16)}
+body{background:radial-gradient(1200px 500px at 85% -5%,rgba(225,6,0,.12),transparent 60%),#050506;-webkit-font-smoothing:antialiased}
+.hero h1{letter-spacing:-.03em}
+.hero p{font-size:1.02rem;line-height:1.6}
+.bar{height:4px;border-radius:4px}
+.stats{padding:14px 0 0;gap:0}
+.stat{padding-right:28px}.stat + .stat{padding-left:28px;border-left:1px solid var(--edge-hi)}
+.stat strong{font-variant-numeric:tabular-nums}
+.stat span{letter-spacing:.04em;text-transform:none;font-size:.8rem}
+.controls{background:rgba(5,5,6,.82);-webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--edge)}
+.search{background:var(--panel);border:1px solid var(--edge-hi);border-radius:12px;padding:13px 16px 13px 44px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:15px 50%;background-size:18px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sort{flex:none;position:relative;display:flex}
+.sort select{appearance:none;-webkit-appearance:none;height:100%;background:var(--panel);color:var(--white);border:1px solid var(--edge-hi);
+  border-radius:12px;padding:0 38px 0 14px;font:inherit;font-size:.92rem;cursor:pointer;transition:border-color .2s,box-shadow .2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:16px}
+.sort select:hover{border-color:var(--red)}
+.sort select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(225,6,0,.22)}
+.sort select option{background:#111;color:#fff}
+.lang{border:1px solid var(--edge-hi);border-radius:12px;background:var(--panel)}
+.lang button{background:transparent;font-size:.85rem;letter-spacing:.04em}
+.chips{padding-top:12px;padding-bottom:4px}
+.chip{border-color:var(--edge-hi);background:var(--panel);font-size:.84rem;padding:7px 15px}
+.chip .n{font-variant-numeric:tabular-nums}
+.count{font-size:.82rem;margin:26px 0 12px}
+.list{gap:10px}
+.song{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);border-radius:14px;box-shadow:0 1px 0 rgba(255,255,255,.03) inset}
+.song:hover,.song.open{border-color:rgba(225,6,0,.65);transform:translateY(-2px)}
+.song::after{box-shadow:0 14px 34px -10px rgba(225,6,0,.45)}
+.row{gap:18px;padding:14px 16px 14px 22px}
+.cover{border:1px solid var(--edge-hi);border-radius:10px}
+.info h3{font-size:1.05rem;letter-spacing:-.005em}
+.tag{background:rgba(255,255,255,.05);border:1px solid var(--edge-hi);color:var(--soft);font-size:.72rem}
+.btn{border-radius:10px;padding:10px 16px;border:1px solid var(--edge-hi);background:rgba(255,255,255,.04);gap:8px}
+.btn:hover{background:var(--white);color:#000;border-color:var(--white)}
+.btn.primary{background:linear-gradient(180deg,var(--red-hi),var(--red));border-color:transparent;box-shadow:0 6px 18px -6px rgba(225,6,0,.7)}
+.btn.primary:hover{background:linear-gradient(180deg,#ff4a40,var(--red-hi));color:#fff}
+.btn svg{width:16px;height:16px;flex:none}
+.album-head{border:1px solid var(--edge);border-radius:16px;background:linear-gradient(100deg,#1a0606,var(--panel) 60%)}
+.to-top{border:1px solid var(--edge-hi);box-shadow:0 8px 24px -6px rgba(225,6,0,.6)}
+footer{border-top:1px solid var(--edge)}
+@media (max-width:640px){
+  .ctrl-row{flex-wrap:wrap}.ctrl-row .search{flex:1 1 100%}
+  .sort{flex:1}.sort select{width:100%;min-height:42px}.lang{min-height:42px}
 }
-/* El logo gira lento aunque el sistema tenga 'reducir animaciones'. Borrá esta regla para respetar esa opción. */
-.asterisk{animation:spin-left var(--disc-speed) linear infinite!important}
+
 </style>
 </head>
 <body>
@@ -216,6 +261,14 @@ footer{border-top:1px solid var(--line);color:var(--soft);font-size:.8rem;paddin
   <div class="wrap">
     <div class="ctrl-row">
       <input id="q" class="search" type="search" placeholder="Buscar canción o álbum…" aria-label="Buscar canción o álbum" data-i18n-ph="search_ph" data-i18n-aria="search_ph" autocomplete="off">
+      <label class="sort" for="sort"><span class="sr" data-i18n="sort_label">Ordenar por</span>
+        <select id="sort" aria-label="Ordenar por" data-i18n-aria="sort_label">
+          <option value="default" data-i18n="sort_default">Orden original</option>
+          <option value="desc" data-i18n="sort_desc">Más canciones primero</option>
+          <option value="asc" data-i18n="sort_asc">Menos canciones primero</option>
+          <option value="az" data-i18n="sort_az">Álbum A–Z</option>
+        </select>
+      </label>
       <div class="lang" role="group" aria-label="Idioma / Language">
         <button type="button" data-lang="es" aria-pressed="true">ES</button>
         <button type="button" data-lang="en" aria-pressed="false">EN</button>
@@ -331,7 +384,9 @@ const I18N = {
     report: "Reportar link", badge_new: "Nuevo", badge_down: "Link caído", top: "Volver arriba",
     report_subject: "Link caído: {song}",
     report_body: "Hola, este link no funciona.\n\nCanción: {song}\nÁlbum: {album}\nLink: {link}\n",
-    footer: "Sitio de fan y para fans de Red Hot Chili Peppers."
+    footer: "Sitio de fan y para fans de Red Hot Chili Peppers.",
+    sort_label: "Ordenar por", sort_default: "Orden original", sort_desc: "Más canciones primero",
+    sort_asc: "Menos canciones primero", sort_az: "Álbum A–Z"
   },
   en: {
     hero_p: "Official Red Hot Chili Peppers multitracks. No ads, direct links. Enjoy!",
@@ -345,7 +400,9 @@ const I18N = {
     report: "Report link", badge_new: "New", badge_down: "Link down", top: "Back to top",
     report_subject: "Broken link: {song}",
     report_body: "Hi, this link is not working.\n\nSong: {song}\nAlbum: {album}\nLink: {link}\n",
-    footer: "A fan site made by and for Red Hot Chili Peppers fans."
+    footer: "A fan site made by and for Red Hot Chili Peppers fans.",
+    sort_label: "Sort by", sort_default: "Original order", sort_desc: "Most songs first",
+    sort_asc: "Fewest songs first", sort_az: "Album A–Z"
   }
 };
 
@@ -415,7 +472,17 @@ function applyStatic() {
 }
 
 let activeAlbum = "Todos";
-const albums = ["Todos", ...new Set(SONGS.map(s => s.album))];
+const baseAlbums = [...new Set(SONGS.map(s => s.album))];
+const albumTotal = a => SONGS.filter(s => s.album === a).length;
+let sortMode = safeGet("sort") || "default";
+function sortedAlbums() {
+  const l = baseAlbums.slice();
+  if (sortMode === "desc") l.sort((a, b) => albumTotal(b) - albumTotal(a));
+  else if (sortMode === "asc") l.sort((a, b) => albumTotal(a) - albumTotal(b));
+  else if (sortMode === "az") l.sort((a, b) => albumName(a).localeCompare(albumName(b)));
+  return l;
+}
+let albums = ["Todos", ...sortedAlbums()];
 
 function el(tag, props = {}, children = []) {
   const n = document.createElement(tag);
@@ -430,7 +497,7 @@ function el(tag, props = {}, children = []) {
 
 let statsAnimated = false;
 function countUp(node, n) {
-  if (statsAnimated || n < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) { node.textContent = String(n); return; }
+  if (statsAnimated || n < 2) { node.textContent = String(n); return; }
   const t0 = performance.now(), dur = 900;
   const step = now => {
     const k = Math.min((now - t0) / dur, 1);
@@ -557,6 +624,16 @@ function card(s) {
       href: "https://www.youtube.com/results?search_query=" + encodeURIComponent("Red Hot Chili Peppers " + s.titulo + " official video") });
   }
 
+  const IC = {
+    dl: '<path d="M12 3v12m0 0-4-4m4 4 4-4M4 20h16"/>',
+    play: '<path d="M8 5v14l11-7z"/>'
+  };
+  const icon = k => { const w = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    w.setAttribute("viewBox", "0 0 24 24"); w.setAttribute("fill", k === "play" ? "currentColor" : "none");
+    w.setAttribute("stroke", "currentColor"); w.setAttribute("stroke-width", "2.2");
+    w.setAttribute("stroke-linecap", "round"); w.setAttribute("stroke-linejoin", "round");
+    w.setAttribute("aria-hidden", "true"); w.innerHTML = IC[k]; return w; };
+  if (hasLink(s)) dl.prepend(icon("dl"));
   const actions = [vid, dl];
   const rep = hasLink(s) ? reportHref(s) : null;
   if (rep) {
@@ -587,7 +664,11 @@ function render() {
   const res = SONGS.filter(s =>
     (activeAlbum === "Todos" || s.album === activeAlbum) &&
     (!q || norm(s.titulo).includes(q) || norm(s.album).includes(q) || norm(s.juego || "").includes(q)));
-  if (ORDENAR_DISPONIBLES_PRIMERO) res.sort((a, b) => hasLink(b) - hasLink(a));
+  const rank = {}; albums.forEach((a, i) => rank[a] = i);
+  res.sort((a, b) => {
+    if (sortMode !== "default" && a.album !== b.album) return rank[a.album] - rank[b.album];
+    return ORDENAR_DISPONIBLES_PRIMERO ? hasLink(b) - hasLink(a) : 0;
+  });
   renderAlbumHead();
   $("list").replaceChildren(...res.map((s, i) => {
     const c = card(s);
@@ -622,7 +703,16 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
+const sortSel = $("sort");
+if (![...sortSel.options].some(o => o.value === sortMode)) sortMode = "default";
+sortSel.value = sortMode;
+sortSel.addEventListener("change", () => {
+  sortMode = sortSel.value; safeSet("sort", sortMode);
+  albums = ["Todos", ...sortedAlbums()];
+  buildChips(); render();
+});
 applyStatic();
+sortSel.value = sortMode;
 renderStats();
 buildChips();
 $("q").addEventListener("input", render);
